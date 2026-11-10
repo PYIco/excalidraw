@@ -149,6 +149,7 @@ import "./index.scss";
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 import { flushCloudSave, scheduleCloudSave } from "./data/cloudDrawings";
+import { isSupabaseShareLinkId, loadShareLinkFiles } from "./data/shareLinks";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -514,10 +515,13 @@ const ExcalidrawWrapper = () => {
               fileIds.map((id) => [id, "loading"]),
             );
           }
-          loadFilesFromFirebase(
-            `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
-            data.key,
-            fileIds,
+          (isSupabaseShareLinkId(data.id)
+            ? loadShareLinkFiles(data.id, data.key, fileIds)
+            : loadFilesFromFirebase(
+                `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+                data.key,
+                fileIds,
+              )
           ).then(({ loadedFiles, erroredFiles }) => {
             excalidrawAPI.addFiles(loadedFiles);
             updateStaleImageStatuses({

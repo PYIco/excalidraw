@@ -36,6 +36,12 @@ const supabase: SupabaseClient | null = isCloudConfigured
     })
   : null;
 
+/** The project's client, or null when cloud features aren't configured. */
+export const getSupabaseClient = () => supabase;
+
+/** Base URL of the Supabase project ("" when not configured). */
+export const getSupabaseUrl = () => (SUPABASE_URL || "").replace(/\/+$/, "");
+
 const TABLE = "drawings";
 const AUTOSAVE_DELAY_MS = 1500;
 const STORAGE_KEY = "excalidraw-cloud-current";

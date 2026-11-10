@@ -37,6 +37,13 @@ import {
 
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+import {
+  getShareLinkSceneUrl,
+  isSupabaseShareLinkId,
+  isSupabaseShareLinksEnabled,
+  ShareLinkSignInRequiredError,
+  uploadShareLink,
+} from "./shareLinks";
 
 import type { WS_SUBTYPES } from "../app_constants";
 
@@ -204,7 +211,11 @@ export const importFromBackend = async (
   decryptionKey: string,
 ): Promise<ImportedDataState> => {
   try {
-    const response = await fetch(`${BACKEND_V2_GET}${id}`);
+    const response = await fetch(
+      isSupabaseShareLinkId(id)
+        ? getShareLinkSceneUrl(id)
+        : `${BACKEND_V2_GET}${id}`,
+    );
 
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
@@ -273,6 +284,16 @@ export const exportToBackend = async (
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });
 
+    // self-hosted: store the encrypted link in this site's Supabase project,
+    // since excalidraw.com's link server only accepts its own origin
+    if (isSupabaseShareLinksEnabled()) {
+      const id = await uploadShareLink(payload, filesToUpload);
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.hash = `json=${id},${encryptionKey}`;
+      return { url: url.toString(), errorMessage: null };
+    }
+
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
       body: payload.buffer,
@@ -302,6 +323,18 @@ export const exportToBackend = async (
   } catch (error: any) {
     console.error(error);
 
+    if (error instanceof ShareLinkSignInRequiredError) {
+      return { url: null, errorMessage: error.message };
+    }
+    if (
+      error?.statusCode === "413" ||
+      /exceeded the maximum/i.test(error?.message)
+    ) {
+      return {
+        url: null,
+        errorMessage: t("alerts.couldNotCreateShareableLinkTooBig"),
+      };
+    }
     return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   }
 };
