@@ -23,7 +23,7 @@ free tiers.
 ## 2. Deploy to DigitalOcean
 
 1. Fork this repository to your GitHub account (if you haven't already).
-2. Edit [`.do/app.yaml`](.do/app.yaml): replace `YOUR-GITHUB-USERNAME`, the
+2. Edit [`.do/app.yaml`](.do/app.yaml): replace the
    Supabase URL, and the anon key. Commit and push.
 3. In DigitalOcean, go to **Apps → Create App**, connect GitHub, and pick the
    repository. When asked, choose to use the app spec from the repo, or paste

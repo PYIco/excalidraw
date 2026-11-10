@@ -1,11 +1,11 @@
 # DigitalOcean App Platform spec for this Excalidraw fork.
-# Static sites are on the free tier. Replace YOUR-GITHUB-USERNAME and the two
+# Static sites are on the free tier. Replace the two
 # Supabase values, then create the app from this spec (see SELF-HOSTING.md).
 name: excalidraw
 static_sites:
   - name: excalidraw
     github:
-      repo: YOUR-GITHUB-USERNAME/excalidraw
+      repo: PYIco/excalidraw
       branch: master
       deploy_on_push: true
     build_command: yarn install --frozen-lockfile --network-timeout 600000 && yarn build:app:docker
