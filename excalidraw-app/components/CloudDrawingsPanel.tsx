@@ -71,37 +71,43 @@ const SignIn = () => {
     );
   }
 
+  const send = async () => {
+    setError(null);
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    try {
+      await sendSignInLink(email.trim());
+      setSent(true);
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  };
+
   return (
     <form
       className="cloud-drawings__signin"
-      onSubmit={(event) => event.preventDefault()}
+      onSubmit={(event) => {
+        event.preventDefault();
+        send();
+      }}
     >
       <p>Sign in to save drawings to your cloud and open them anywhere.</p>
+      {/* type="text", not "email": the editor only ignores keystrokes from
+          text-like inputs, so an email input would trigger tool shortcuts */}
       <input
         className="cloud-drawings__input"
-        type="email"
+        type="text"
+        inputMode="email"
         autoComplete="email"
+        autoCapitalize="none"
+        spellCheck={false}
         placeholder="you@example.com"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
       />
-      <FilledButton
-        fullWidth
-        label="Email me a sign-in link"
-        onClick={async () => {
-          setError(null);
-          if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-            setError("Enter a valid email address.");
-            return;
-          }
-          try {
-            await sendSignInLink(email.trim());
-            setSent(true);
-          } catch (err) {
-            setError(errorMessage(err));
-          }
-        }}
-      />
+      <FilledButton fullWidth label="Email me a sign-in link" onClick={send} />
       {error && <p className="cloud-drawings__error">{error}</p>}
     </form>
   );
