@@ -6,7 +6,28 @@ import {
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
+import { CloudDrawingsPanel } from "./CloudDrawingsPanel";
+
 import "./AppSidebar.scss";
+
+export const CLOUD_DRAWINGS_TAB = "drawings";
+
+// tabler-icons: cloud
+const cloudIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M6.657 18c-2.572 0 -4.657 -2.007 -4.657 -4.483c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 1.927 -1.551 3.487 -3.465 3.487h-11.878" />
+  </svg>
+);
 
 type SidebarPromoCopyProps = {
   text: string;
@@ -72,6 +93,15 @@ export const AppSidebar = () => {
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
         <Sidebar.TabTrigger
+          tab={CLOUD_DRAWINGS_TAB}
+          title="My drawings"
+          style={{
+            opacity: openSidebar?.tab === CLOUD_DRAWINGS_TAB ? 1 : 0.4,
+          }}
+        >
+          {cloudIcon}
+        </Sidebar.TabTrigger>
+        <Sidebar.TabTrigger
           tab="comments"
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
         >
@@ -84,6 +114,9 @@ export const AppSidebar = () => {
           {presentationIcon}
         </Sidebar.TabTrigger>
       </DefaultSidebar.TabTriggers>
+      <Sidebar.Tab tab={CLOUD_DRAWINGS_TAB}>
+        <CloudDrawingsPanel />
+      </Sidebar.Tab>
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">
           <div

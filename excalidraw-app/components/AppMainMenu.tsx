@@ -2,18 +2,20 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  LoadIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { MainMenu } from "@excalidraw/excalidraw/index";
+import { MainMenu, useExcalidrawAPI } from "@excalidraw/excalidraw/index";
 import React from "react";
 
-import { isDevEnv } from "@excalidraw/common";
+import { DEFAULT_SIDEBAR, isDevEnv } from "@excalidraw/common";
 
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
+import { CLOUD_DRAWINGS_TAB } from "./AppSidebar";
 import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
@@ -24,8 +26,21 @@ export const AppMainMenu: React.FC<{
   refresh: () => void;
 }> = React.memo((props) => {
   const { t } = useI18n();
+  const excalidrawAPI = useExcalidrawAPI();
   return (
     <MainMenu>
+      <MainMenu.Item
+        icon={LoadIcon}
+        onSelect={() =>
+          excalidrawAPI?.toggleSidebar({
+            name: DEFAULT_SIDEBAR.name,
+            tab: CLOUD_DRAWINGS_TAB,
+            force: true,
+          })
+        }
+      >
+        My drawings
+      </MainMenu.Item>
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />

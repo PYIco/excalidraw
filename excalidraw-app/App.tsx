@@ -148,6 +148,7 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import { flushCloudSave, scheduleCloudSave } from "./data/cloudDrawings";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -753,6 +754,10 @@ const ExcalidrawWrapper = () => {
       });
     }
 
+    if (excalidrawAPI) {
+      scheduleCloudSave(excalidrawAPI);
+    }
+
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(
@@ -763,6 +768,21 @@ const ExcalidrawWrapper = () => {
       );
     }
   };
+
+  // save the open cloud drawing right away when the tab is hidden or closed
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        flushCloudSave();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", flushCloudSave);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", flushCloudSave);
+    };
+  }, []);
 
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
     null,
