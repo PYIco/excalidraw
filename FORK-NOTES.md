@@ -59,6 +59,27 @@ Playwright test under `excalidraw-app/tests/` if this grows.
    for customers.
 6. Merge `cloud-drawings` into `master` and point DigitalOcean at `master`
    once the owner is happy.
+7. **Text resizing that's easier to discover.** Excalidraw already re-flows a
+   standalone text element when you drag its left or right edge (width
+   changes, height follows, font size stays): see `resizeSingleTextElement`
+   in `packages/element/src/resizeElements.ts`. Corners and top/bottom edges
+   scale the font instead. On desktop the side edges have no visible handle
+   (`DEFAULT_OMIT_SIDES` in `packages/element/src/transformHandles.ts`; edge
+   drags are hit-tested in `resizeTest.ts`), so users don't find it. The owner
+   wants:
+   - **Visible side handles on text elements** (at least `e`/`w`) so the
+     width-only drag is obvious. Small change.
+   - **Multi-line pastes stay one text block.** Normal paste splits text into
+     one element per line (`addTextFromPaste` in
+     `packages/excalidraw/components/App.clipboard.ts`, `text.split("\n")`);
+     only Ctrl/Cmd+Shift+V keeps it whole. Make whole-block the default.
+     Small change.
+   - **Corner drags re-flow instead of scaling**, with a modifier (e.g. Shift)
+     to scale. Changes core behavior, so prototype it and let the owner try it
+     before committing.
+
+   These touch `packages/*` (the editor library), so they're also candidates
+   to propose upstream; open an issue there before sending a PR.
 
 Upstream bug worth reporting: `isWritableElement` in
 `packages/common/src/utils.ts` doesn't treat `type="email"` (or `url`, `tel`)
