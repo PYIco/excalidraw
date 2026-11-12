@@ -80,6 +80,33 @@ Playwright test under `excalidraw-app/tests/` if this grows.
 
    These touch `packages/*` (the editor library), so they're also candidates
    to propose upstream; open an issue there before sending a PR.
+8. **Comments (account required).** Open-source Excalidraw has none; the
+   speech-bubble sidebar tab (`tab="comments"` in
+   `excalidraw-app/components/AppSidebar.tsx`) is just an Excalidraw+ ad.
+   The owner wants real comments that only signed-in people can read and
+   write, on boards shared with their team or customers. Spec:
+   - **Board sharing first** (shared with live collaboration, item 1, so
+     design it once): the owner invites people to a saved drawing by email
+     with a role (viewer, commenter, editor). Suggested table
+     `drawing_members (drawing_id, user_id, role, invited_email)`, with the
+     `drawings` RLS policies extended so members can read (and editors
+     update). Invites must work even if sign-ups are invite-only (item 3).
+     Share links stay separate: they're frozen encrypted copies, so comments
+     can't live on them.
+   - **Comments table:** `comments (id, drawing_id, author_id, parent_id for
+     replies, body, anchor as scene x/y or element id, resolved_at,
+     created_at, updated_at)`. RLS: owner and members can read; commenters
+     and editors can add; authors edit or delete their own; the owner can
+     resolve or delete any.
+   - **UI:** replace the Excalidraw+ comments promo tab with the real thread
+     list; a comment tool that drops a pin where you click; pins drawn as an
+     overlay that follows pan/zoom (and follows the element if anchored to
+     one); reply, resolve, and show resolved; live updates via Supabase
+     Realtime.
+   - **Later:** email notifications for new comments and @mentions.
+
+   Write the SQL as a new file in `supabase/` and ask the owner before running
+   it on the live project.
 
 Upstream bug worth reporting: `isWritableElement` in
 `packages/common/src/utils.ts` doesn't treat `type="email"` (or `url`, `tel`)
